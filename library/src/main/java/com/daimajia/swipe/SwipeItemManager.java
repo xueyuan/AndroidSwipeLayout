@@ -1,58 +1,52 @@
-package com.daimajia.swipe.implments;
-
-import android.view.View;
-
-import com.daimajia.swipe.SimpleSwipeListener;
-import com.daimajia.swipe.SwipeLayout;
-import com.daimajia.swipe.interfaces.SwipeAdapterInterface;
-import com.daimajia.swipe.interfaces.SwipeItemMangerInterface;
-import com.daimajia.swipe.util.Attributes;
+package com.daimajia.swipe;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.BaseAdapter;
 
 /**
  * SwipeItemMangerImpl is a helper class to help all the adapters to maintain open status.
  */
-public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
+public class SwipeItemManager {
 
-    private Attributes.Mode mode = Attributes.Mode.Single;
+    private Mode mode = Mode.Single;
     public final int INVALID_POSITION = -1;
 
     protected int mOpenPosition = INVALID_POSITION;
 
     protected Set<Integer> mOpenPositions = new HashSet<Integer>();
     protected Set<SwipeLayout> mShownLayouts = new HashSet<SwipeLayout>();
+    RecyclerView.Adapter<?> mRecyclerViewAdapter;
+    BaseAdapter mBaseAdapter;
 
-    protected SwipeAdapterInterface swipeAdapterInterface;
-
-    public SwipeItemMangerImpl(SwipeAdapterInterface swipeAdapterInterface) {
-        if (swipeAdapterInterface == null)
-            throw new IllegalArgumentException("SwipeAdapterInterface can not be null");
-
-        this.swipeAdapterInterface = swipeAdapterInterface;
+    public SwipeItemManager() {
     }
 
-    public Attributes.Mode getMode() {
+    public void setRecyclerViewAdapter(RecyclerView.Adapter<?> recyclerViewAdapter) {
+        mRecyclerViewAdapter = recyclerViewAdapter;
+    }
+
+    public void setBaseAdapter(BaseAdapter baseAdapter) {
+        mBaseAdapter = baseAdapter;
+    }
+
+    public Mode getMode() {
         return mode;
     }
 
-    public void setMode(Attributes.Mode mode) {
+    public void setMode(Mode mode) {
         this.mode = mode;
         mOpenPositions.clear();
         mShownLayouts.clear();
         mOpenPosition = INVALID_POSITION;
     }
 
-    public void bind(View view, int position) {
-        int resId = swipeAdapterInterface.getSwipeLayoutResourceId(position);
-        SwipeLayout swipeLayout = (SwipeLayout) view.findViewById(resId);
-        if (swipeLayout == null)
-            throw new IllegalStateException("can not find SwipeLayout in target view");
-
+    public void bind(SwipeLayout swipeLayout, View view, int position, int resId) {
         if (swipeLayout.getTag(resId) == null) {
             OnLayoutListener onLayoutListener = new OnLayoutListener(position);
             SwipeMemory swipeMemory = new SwipeMemory(position);
@@ -61,36 +55,33 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
             swipeLayout.setTag(resId, new ValueBox(position, swipeMemory, onLayoutListener));
             mShownLayouts.add(swipeLayout);
         } else {
-            ValueBox valueBox = (ValueBox) swipeLayout.getTag(resId);
+            ValueBox valueBox = (ValueBox)swipeLayout.getTag(resId);
             valueBox.swipeMemory.setPosition(position);
             valueBox.onLayoutListener.setPosition(position);
             valueBox.position = position;
         }
     }
 
-    @Override
     public void openItem(int position) {
-        if (mode == Attributes.Mode.Multiple) {
+        if (mode == Mode.Multiple) {
             if (!mOpenPositions.contains(position))
                 mOpenPositions.add(position);
         } else {
             mOpenPosition = position;
         }
-        swipeAdapterInterface.notifyDatasetChanged();
+        notifyDataSetChanged();
     }
 
-    @Override
     public void closeItem(int position) {
-        if (mode == Attributes.Mode.Multiple) {
+        if (mode == Mode.Multiple) {
             mOpenPositions.remove(position);
         } else {
             if (mOpenPosition == position)
                 mOpenPosition = INVALID_POSITION;
         }
-        swipeAdapterInterface.notifyDatasetChanged();
+        notifyDataSetChanged();
     }
 
-    @Override
     public void closeAllExcept(SwipeLayout layout) {
         for (SwipeLayout s : mShownLayouts) {
             if (s != layout)
@@ -98,9 +89,18 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
         }
     }
 
-    @Override
+    void notifyDataSetChanged() {
+        if (mRecyclerViewAdapter != null) {
+            mRecyclerViewAdapter.notifyDataSetChanged();
+        } else if (mBaseAdapter != null) {
+            mBaseAdapter.notifyDataSetChanged();
+        } else {
+            throw new RuntimeException("Adapters are not set before the code is used");
+        }
+    }
+
     public void closeAllItems() {
-        if (mode == Attributes.Mode.Multiple) {
+        if (mode == Mode.Multiple) {
             mOpenPositions.clear();
         } else {
             mOpenPosition = INVALID_POSITION;
@@ -110,32 +110,32 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
         }
     }
 
-    @Override
     public void removeShownLayouts(SwipeLayout layout) {
         mShownLayouts.remove(layout);
     }
 
-    @Override
     public List<Integer> getOpenItems() {
-        if (mode == Attributes.Mode.Multiple) {
+        if (mode == Mode.Multiple) {
             return new ArrayList<Integer>(mOpenPositions);
         } else {
             return Collections.singletonList(mOpenPosition);
         }
     }
 
-    @Override
     public List<SwipeLayout> getOpenLayouts() {
         return new ArrayList<SwipeLayout>(mShownLayouts);
     }
 
-    @Override
     public boolean isOpen(int position) {
-        if (mode == Attributes.Mode.Multiple) {
+        if (mode == Mode.Multiple) {
             return mOpenPositions.contains(position);
         } else {
             return mOpenPosition == position;
         }
+    }
+
+    public enum Mode {
+        Single, Multiple
     }
 
     class ValueBox {
@@ -183,7 +183,7 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
 
         @Override
         public void onClose(SwipeLayout layout) {
-            if (mode == Attributes.Mode.Multiple) {
+            if (mode == Mode.Multiple) {
                 mOpenPositions.remove(position);
             } else {
                 mOpenPosition = INVALID_POSITION;
@@ -192,14 +192,14 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
 
         @Override
         public void onStartOpen(SwipeLayout layout) {
-            if (mode == Attributes.Mode.Single) {
+            if (mode == Mode.Single) {
                 closeAllExcept(layout);
             }
         }
 
         @Override
         public void onOpen(SwipeLayout layout) {
-            if (mode == Attributes.Mode.Multiple)
+            if (mode == Mode.Multiple)
                 mOpenPositions.add(position);
             else {
                 closeAllExcept(layout);
@@ -211,5 +211,4 @@ public class SwipeItemMangerImpl implements SwipeItemMangerInterface {
             this.position = position;
         }
     }
-
 }

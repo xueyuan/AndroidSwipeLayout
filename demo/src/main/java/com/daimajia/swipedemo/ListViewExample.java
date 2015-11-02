@@ -16,8 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.daimajia.swipe.SwipeItemManager;
 import com.daimajia.swipe.SwipeLayout;
-import com.daimajia.swipe.util.Attributes;
 import com.daimajia.swipedemo.adapter.ListViewAdapter;
 
 public class ListViewExample extends Activity {
@@ -45,11 +45,12 @@ public class ListViewExample extends Activity {
 //                "DDMS", "Android Studio", "Fragment", "Loader", "Activity", "Service", "Content Provider", "Intent",
 //                "BroadcastReceiver", "ADT", "Sqlite3", "HttpClient", "Activity", "Service", "Content Provider", "Intent",
 //                "BroadcastReceiver", "ADT", "Sqlite3", "HttpClient"};
-//        mListView.setAdapter(new ArraySwipeAdapterSample<String>(this, R.layout.listview_item, R.id.position, adapterData));
+//        mListView.setRecyclerViewAdapter(new ArraySwipeAdapterSample<String>(this, R.layout.listview_item, R.id.position, adapterData));
 
-        mAdapter = new ListViewAdapter(this);
+        SwipeItemManager mgr = new SwipeItemManager();
+        mgr.setMode(SwipeItemManager.Mode.Single);
+        mAdapter = new ListViewAdapter(this, mgr);
         mListView.setAdapter(mAdapter);
-        mAdapter.setMode(Attributes.Mode.Single);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

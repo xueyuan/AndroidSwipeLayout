@@ -1,5 +1,6 @@
 package com.daimajia.swipedemo.adapter;
 
+import java.util.ArrayList;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,15 +14,13 @@ import android.widget.Toast;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
+import com.daimajia.swipe.SwipeItemManager;
 import com.daimajia.swipe.SwipeLayout;
-import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 import com.daimajia.swipedemo.R;
 
-import java.util.ArrayList;
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.SimpleViewHolder>  {
 
-public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapter.SimpleViewHolder> {
-
-    public static class SimpleViewHolder extends RecyclerView.ViewHolder {
+    public class SimpleViewHolder extends RecyclerView.ViewHolder {
         SwipeLayout swipeLayout;
         TextView textViewPos;
         TextView textViewData;
@@ -44,14 +43,15 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
         }
     }
 
-    private Context mContext;
-    private ArrayList<String> mDataset;
+    Context mContext;
+    ArrayList<String> mDataset;
+    SwipeItemManager mItemManager;
 
-    //protected SwipeItemRecyclerMangerImpl mItemManger = new SwipeItemRecyclerMangerImpl(this);
-
-    public RecyclerViewAdapter(Context context, ArrayList<String> objects) {
+    public RecyclerViewAdapter(Context context, SwipeItemManager itemManager, ArrayList<String> objects) {
         this.mContext = context;
         this.mDataset = objects;
+        mItemManager = itemManager;
+        mItemManager.setRecyclerViewAdapter(this);
     }
 
     @Override
@@ -79,26 +79,21 @@ public class RecyclerViewAdapter extends RecyclerSwipeAdapter<RecyclerViewAdapte
         viewHolder.buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mItemManger.removeShownLayouts(viewHolder.swipeLayout);
+                mItemManager.removeShownLayouts(viewHolder.swipeLayout);
                 mDataset.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, mDataset.size());
-                mItemManger.closeAllItems();
+                mItemManager.closeAllItems();
                 Toast.makeText(view.getContext(), "Deleted " + viewHolder.textViewData.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
         });
         viewHolder.textViewPos.setText((position + 1) + ".");
         viewHolder.textViewData.setText(item);
-        mItemManger.bind(viewHolder.itemView, position);
+        mItemManager.bind(viewHolder.swipeLayout, viewHolder.itemView, position, R.id.swipe);
     }
 
     @Override
     public int getItemCount() {
         return mDataset.size();
-    }
-
-    @Override
-    public int getSwipeLayoutResourceId(int position) {
-        return R.id.swipe;
     }
 }

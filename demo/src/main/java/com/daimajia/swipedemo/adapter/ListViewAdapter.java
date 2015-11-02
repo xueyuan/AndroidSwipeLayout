@@ -4,33 +4,31 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
+import com.daimajia.swipe.SwipeItemManager;
 import com.daimajia.swipe.SwipeLayout;
-import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 import com.daimajia.swipedemo.R;
 
-public class ListViewAdapter extends BaseSwipeAdapter {
+public class ListViewAdapter extends BaseAdapter {
 
     private Context mContext;
+    SwipeItemManager mItemManager;
 
-    public ListViewAdapter(Context mContext) {
-        this.mContext = mContext;
+    public ListViewAdapter(Context context, SwipeItemManager itemManager) {
+        this.mContext = context;
+        mItemManager = itemManager;
+        mItemManager.setBaseAdapter(this);
     }
 
-    @Override
-    public int getSwipeLayoutResourceId(int position) {
-        return R.id.swipe;
-    }
-
-    @Override
-    public View generateView(int position, ViewGroup parent) {
+    View generateView(int position, ViewGroup parent) {
         View v = LayoutInflater.from(mContext).inflate(R.layout.listview_item, null);
-        SwipeLayout swipeLayout = (SwipeLayout)v.findViewById(getSwipeLayoutResourceId(position));
+        SwipeLayout swipeLayout = (SwipeLayout)v.findViewById(R.id.swipe);
         swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
             public void onOpen(SwipeLayout layout) {
@@ -53,7 +51,19 @@ public class ListViewAdapter extends BaseSwipeAdapter {
     }
 
     @Override
-    public void fillValues(int position, View convertView) {
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View v = convertView;
+        if (v == null) {
+            v = generateView(position, parent);
+        }
+        View v2 = LayoutInflater.from(mContext).inflate(R.layout.listview_item, null);
+        SwipeLayout swipeLayout = (SwipeLayout)v2.findViewById(R.id.swipe);
+        mItemManager.bind(swipeLayout, v, position, R.id.swipe);
+        fillValues(position, v);
+        return v;
+    }
+
+    void fillValues(int position, View convertView) {
         TextView t = (TextView)convertView.findViewById(R.id.position);
         t.setText((position + 1) + ".");
     }

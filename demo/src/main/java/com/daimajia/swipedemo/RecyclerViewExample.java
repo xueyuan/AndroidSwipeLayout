@@ -1,5 +1,7 @@
 package com.daimajia.swipedemo;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -11,13 +13,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.daimajia.swipe.util.Attributes;
+import com.daimajia.swipe.SwipeItemManager;
 import com.daimajia.swipedemo.adapter.RecyclerViewAdapter;
 import com.daimajia.swipedemo.adapter.util.DividerItemDecoration;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 
 public class RecyclerViewExample extends Activity {
@@ -33,6 +31,7 @@ public class RecyclerViewExample extends Activity {
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
+    private SwipeItemManager mItemManager;
 
     private ArrayList<String> mDataSet;
 
@@ -58,8 +57,9 @@ public class RecyclerViewExample extends Activity {
         // Adapter:
         String[] adapterData = new String[]{"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"};
         mDataSet = new ArrayList<String>(Arrays.asList(adapterData));
-        mAdapter = new RecyclerViewAdapter(this, mDataSet);
-        ((RecyclerViewAdapter) mAdapter).setMode(Attributes.Mode.Single);
+        mItemManager = new SwipeItemManager();
+        mItemManager.setMode(SwipeItemManager.Mode.Single);
+        mAdapter = new RecyclerViewAdapter(this, mItemManager, mDataSet);
         recyclerView.setAdapter(mAdapter);
 
         /* Listeners */
