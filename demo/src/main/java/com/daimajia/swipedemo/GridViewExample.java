@@ -10,7 +10,7 @@ import android.widget.GridView;
 import com.daimajia.swipe.SwipeItemManager;
 import com.daimajia.swipedemo.adapter.GridViewAdapter;
 
-public class GridViewExample extends Activity{
+public class GridViewExample extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +25,14 @@ public class GridViewExample extends Activity{
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("onItemLongClick","onItemLongClick:" + position);
+                Log.e("onItemLongClick", "onItemLongClick:" + position);
                 return false;
             }
         });
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("onItemClick","onItemClick:" + position);
+                Log.e("onItemClick", "onItemClick:" + position);
             }
         });
 
@@ -40,7 +40,7 @@ public class GridViewExample extends Activity{
         gridView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("onItemSelected","onItemSelected:" + position);
+                Log.e("onItemSelected", "onItemSelected:" + position);
             }
 
             @Override

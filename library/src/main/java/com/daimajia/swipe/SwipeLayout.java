@@ -1,5 +1,12 @@
 package com.daimajia.swipe;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
@@ -19,14 +26,6 @@ import android.view.ViewParent;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public class SwipeLayout extends FrameLayout {
     @Deprecated
@@ -1343,9 +1342,9 @@ public class SwipeLayout extends FrameLayout {
         }
         int dx, dy;
         Rect rect = computeSurfaceLayoutArea(true);
-        if (smooth) {
-            mDragHelper.smoothSlideViewTo(surface, rect.left, rect.top);
-        } else {
+//        if (smooth) {
+//            mDragHelper.smoothSlideViewTo(surface, rect.left, rect.top);
+//        } else {
             dx = rect.left - surface.getLeft();
             dy = rect.top - surface.getTop();
             surface.layout(rect.left, rect.top, rect.right, rect.bottom);
@@ -1361,7 +1360,7 @@ public class SwipeLayout extends FrameLayout {
             } else {
                 safeBottomView();
             }
-        }
+//        }
         invalidate();
     }
 
@@ -1528,7 +1527,7 @@ public class SwipeLayout extends FrameLayout {
         setCurrentDragEdge(dragEdge);
     }
 
-    protected void onViewRemoved(View child) {
+    protected void onAViewRemoved(View child) {
         for (Map.Entry<DragEdge, View> entry : new HashMap<DragEdge, View>(mDragEdges).entrySet()) {
             if (entry.getValue() == child) {
                 mDragEdges.remove(entry.getKey());

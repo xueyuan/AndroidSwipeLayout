@@ -23,7 +23,8 @@ public class GridViewAdapter extends BaseAdapter {
     }
 
     View generateView(int position, ViewGroup parent) {
-        return LayoutInflater.from(mContext).inflate(R.layout.grid_item, null);
+        View view =  LayoutInflater.from(mContext).inflate(R.layout.grid_item, null);
+        return view;
     }
 
     void fillValues(int position, View convertView) {

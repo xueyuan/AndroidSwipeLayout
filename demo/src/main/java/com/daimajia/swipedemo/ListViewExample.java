@@ -30,7 +30,7 @@ public class ListViewExample extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.listview);
-        mListView = (ListView) findViewById(R.id.listview);
+        mListView = (ListView)findViewById(R.id.listview);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             ActionBar actionBar = getActionBar();
             if (actionBar != null) {
